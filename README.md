@@ -1,20 +1,15 @@
 # TD2 C++/UML - 几何形状类设计与实现
 
-## 项目概述
-
-本项目是INSA Lyon IF3课程的TD2作业，实现了基于C++的几何形状处理程序。项目包含Point（点）、Triangle（三角形）、Quadri（四边形）和Cercle（圆）类的设计与实现，以及基于继承的类层次结构。
-
 ## 题目描述
 
 ### IF3 INSA GE - TD MOO : C++ / UML (第2次课/共6次课)
 
-本TD的目标是操作基于Point类的几何形状，包括：
+本TD的目标是操作基于Point类的几何形状。
 
 #### 练习1：准备工作，UML建模
 
-以下是Point类的UML图表及其定义：
+以下是Point类的UML图表：
 
-**Point类图：**
 ```
 Point
 -X: double
@@ -30,20 +25,57 @@ Point
 +SetY(y: double): void
 ```
 
-**题目要求：**
+**题目：**
 
-**1-a** 分析程序：理解代码的每一行并给出产生的输出
+**1-a** 分析以下程序，理解代码的每一行并给出产生的输出：
+
+```cpp
+#include <iostream>
+#include "TD_Point.h"
+using namespace std;
+
+int main(void)
+{
+    cout << " #### exo 1 #### " << endl;
+    Point pt1(1,1);
+    Point pt2;
+    Point * _pt;
+    pt2 = Point(3,1);
+    _pt = new Point();
+    cout << "Position de pt1 : ";
+    pt1.Afficher();
+    pt1.SetX(2); pt1.SetY(3);
+    pt1.Afficher();
+    cout << endl;
+    cout << "Position de pt2 : ";
+    pt2.Afficher();
+    cout << endl;
+    *_pt = pt1.Add(pt2);
+    cout << "Position de pt3 : ";
+    _pt->Afficher();
+    cout << endl;
+    delete _pt;
+    cout << "Appuyer sur Entree pour continuer" << endl;
+    cin.get();
+    return 0;
+}
+```
+
 **1-b** 实现Point类成员函数"Distance"，计算两点间的距离
+
 **1-c** 用UML建模Triangle类，包含以下功能：
 - 对字段(3个点)的读写访问函数
 - Affichage：显示3个点的坐标
 - Perimetre：返回三角形的周长
 - Translation：通过向量平移三角形
-- Aire：返回三角形的面积(海伦公式)
+- Aire：返回三角形的面积(海伦公式：Aire = √[p(p-a)(p-b)(p-c)]，其中p = (a+b+c)/2)
 
 **1-d** 用UML建模Quadri类，具有triangle类的所有功能，但用于四边形
+
 **1-e** 用UML建模Cercle类，具有triangle类的所有功能，但用于圆
+
 **1-f** 识别三个类中的共同点
+
 **1-g** 提出此应用程序的分层建模
 
 #### 练习2：实现，第一批类
@@ -53,58 +85,205 @@ Point
 **2-c** 实现Triangle类
 **2-d** 使用继承机制实现Forme基类和派生类
 
-## 项目结构
+#### 四边形面积计算特殊说明
+
+对于凹四边形，需要特殊处理：
+- 四边形可以分解为2个三角形，有2种不同的方式
+- 对于凹四边形，只有2种分割中的一种能正确计算面积
+- 要找到正确的分割，必须找到2个不相连的点，从一个点到另一个点的2个角度符号相反
+
+- 要找到正确的分割，必须找到2个不相连的点，从一个点到另一个点的2个角度符号相反
+
+---
+
+## 详细解答
+
+### 1-a 程序分析
+
+分析程序中的每一行代码：
+
+```cpp
+cout << " #### exo 1 #### " << endl;    // 输出标题
+Point pt1(1,1);                         // 创建点pt1，坐标(1,1)
+Point pt2;                              // 创建默认点pt2，坐标(0,0)
+Point * _pt;                            // 声明Point类型指针
+pt2 = Point(3,1);                       // 创建临时点(3,1)赋值给pt2
+_pt = new Point();                      // 动态分配默认点(0,0)
+cout << "Position de pt1 : ";          // 输出提示
+pt1.Afficher();                         // 输出pt1：(1,1)
+pt1.SetX(2); pt1.SetY(3);              // 修改pt1为(2,3)
+pt1.Afficher();                         // 输出修改后的pt1：(2,3)
+cout << endl;
+cout << "Position de pt2 : ";          // 输出提示
+pt2.Afficher();                         // 输出pt2：(3,1)
+cout << endl;
+*_pt = pt1.Add(pt2);                    // 计算(2,3)+(3,1)=(5,4)
+cout << "Position de pt3 : ";          // 输出提示
+_pt->Afficher();                        // 输出结果：(5,4)
+cout << endl;
+delete _pt;                             // 释放内存
+```
+
+**程序输出：**
+```
+ #### exo 1 #### 
+Position de pt1 : (1 ,1 )(2 ,3 )
+Position de pt2 : (3 ,1 )
+Position de pt3 : (5 ,4 )
+Appuyer sur Entree pour continuer
+```
+
+### 1-b Distance函数实现
+
+```cpp
+// 在TD_Point.h中声明
+double Distance(const Point &pt) const;
+
+// 在TD_Point.cpp中实现
+double Point::Distance(const Point &pt) const
+{
+    double dx = X - pt.X;
+    double dy = Y - pt.Y;
+    return sqrt(dx * dx + dy * dy);
+}
+```
+
+使用欧几里得距离公式：d = √((x₂ - x₁)² + (y₂ - y₁)²)
+
+### 1-c Triangle类UML建模
 
 ```
-td2cpp/
-├── 题目.md                    # 原始题目描述
-├── solution.md               # 完整解答文档
-├── README.md                 # 项目说明（本文件）
-└── TD2 2/
-    ├── Sources_Question_2a/  # 基础实现（无继承）
-    │   ├── TD_Point.h/.cpp           # Point类
-    │   ├── TD_Triangle.h/.cpp        # Triangle类
-    │   ├── TD_main.cpp              # 主程序
-    │   ├── Test_*.cpp               # 测试程序
-    │   ├── CMakeLists.txt           # CMake构建文件
-    │   └── build/                   # 构建目录
-    └── Sources_Question_2d/  # 继承实现
-        ├── TD_Point.h/.cpp           # Point类（扩展版）
-        ├── TD_Forme.h/.cpp           # Forme抽象基类
-        ├── TD_Triangle.h/.cpp        # Triangle类（继承版）
-        ├── TD_Forme_Quadri.h/.cpp    # Quadri类
-        ├── TD_Forme_Cercle.h/.cpp    # Cercle类
-        ├── Test_*.cpp               # 测试程序
-        ├── CMakeLists.txt           # CMake构建文件
-        └── build/                   # 构建目录
+Triangle
+-pt1: Point
+-pt2: Point
+-pt3: Point
++Triangle(p1: Point, p2: Point, p3: Point)
++GetPoint1(): Point
++GetPoint2(): Point
++GetPoint3(): Point
++SetPoint1(p: Point): void
++SetPoint2(p: Point): void
++SetPoint3(p: Point): void
++Afficher(): void
++Perimetre(): double
++Translation(v: Point): void
++Aire(): double
 ```
 
-## 主要功能
+**实现关键方法：**
 
-### 1. Point类
-- 表示平面上的点（X, Y坐标）
-- 支持点的加法（向量加法）
-- 计算两点间的欧几里得距离
-- 计算向量积（用于判断旋转方向）
+```cpp
+// 计算周长
+double Triangle::Perimetre() const
+{
+    double side1 = pt1.Distance(pt2);
+    double side2 = pt2.Distance(pt3);
+    double side3 = pt3.Distance(pt1);
+    return side1 + side2 + side3;
+}
 
-### 2. Triangle类
-- 由三个Point对象定义三角形
-- 计算周长和面积（海伦公式）
-- 支持平移操作
-- 提供点的访问器函数
+// 计算面积（海伦公式）
+double Triangle::Aire() const
+{
+    double side1 = pt1.Distance(pt2);
+    double side2 = pt2.Distance(pt3);
+    double side3 = pt3.Distance(pt1);
+    
+    double p = (side1 + side2 + side3) / 2.0;
+    return sqrt(p * (p - side1) * (p - side2) * (p - side3));
+}
 
-### 3. Quadri类（四边形）
-- 由四个Point对象定义四边形
-- **特殊处理凹四边形**：使用向量积判断正确的三角形分解方式
-- 正确计算任意四边形面积
-- 支持所有基本几何操作
+// 平移
+void Triangle::Translation(const Point &v)
+{
+    pt1 = pt1.Add(v);
+    pt2 = pt2.Add(v);
+    pt3 = pt3.Add(v);
+}
+```
 
-### 4. Cercle类（圆）
-- 由中心点和半径定义圆
-- 计算周长（2πr）和面积（πr²）
-- 特殊的显示和操作方法
+### 1-d Quadri类UML建模
 
-### 5. 继承体系
+```
+Quadri
+-pt1: Point
+-pt2: Point
+-pt3: Point
+-pt4: Point
++Quadri(p1: Point, p2: Point, p3: Point, p4: Point)
++GetPoint1(): Point
++GetPoint2(): Point
++GetPoint3(): Point
++GetPoint4(): Point
++SetPoint1(p: Point): void
++SetPoint2(p: Point): void
++SetPoint3(p: Point): void
++SetPoint4(p: Point): void
++Afficher(): void
++Perimetre(): double
++Translation(v: Point): void
++Aire(): double
+```
+
+**特殊实现 - 凹四边形面积计算：**
+
+```cpp
+double Quadri::Aire() const
+{
+    // 检查两种分解方式，选择正确的一种
+    // 使用向量积判断角度符号
+    // 选择向量积符号相反的分解方式
+    // 返回两个三角形面积之和
+}
+```
+
+### 1-e Cercle类UML建模
+
+```
+Cercle
+-center: Point
+-rayon: double
++Cercle(center: Point, r: double)
++GetCenter(): Point
++GetRayon(): double
++SetCenter(p: Point): void
++SetRayon(r: double): void
++Afficher(): void
++Perimetre(): double
++Translation(v: Point): void
++Aire(): double
+```
+
+**实现关键方法：**
+
+```cpp
+double Cercle::Perimetre() const
+{
+    return 2 * M_PI * rayon;
+}
+
+double Cercle::Aire() const
+{
+    return M_PI * rayon * rayon;
+}
+```
+
+### 1-f 共同点分析
+
+**共同字段：**
+- 都有用于定位的Point类型字段
+- 都需要存储几何形状的基本信息
+
+**共同成员函数：**
+- `Afficher()`: 显示几何形状信息
+- `Perimetre()`: 计算周长
+- `Translation()`: 平移操作
+- `Aire()`: 计算面积
+- 访问器函数（getter/setter）
+
+### 1-g 分层建模设计
+
+**继承层次结构：**
 ```
 Forme (抽象基类)
 ├── Triangle
@@ -112,188 +291,68 @@ Forme (抽象基类)
 └── Cercle
 ```
 
-- **Forme基类**：提供通用的几何形状接口
-- **纯虚函数Aire()**：由派生类具体实现
-- **虚函数**：Perimetre(), Translation(), Afficher()
-- **多态性**：支持统一接口操作不同形状
+**Forme基类设计：**
+```cpp
+class Forme
+{
+protected:
+    int NbSommets;
+    Point *Sommets; 
 
-## 特殊算法实现
+public:
+    Forme(int nbsommets = 1);
+    virtual ~Forme();
+    
+    virtual void Afficher() const;
+    virtual double Aire() const = 0;      // 纯虚函数
+    virtual double Perimetre() const;
+    virtual void Translation(const Point &pt);
+    
+    void SetPoint(int i, const Point &pt);
+    Point & GetPoint(int i) const;
+    int GetNbSommets() const;
+};
+```
 
-### 四边形面积计算算法
+### 2-a 到 2-d 实现验证
 
-对于四边形面积计算，项目实现了处理凹四边形的特殊算法：
+所有类都已完整实现并通过测试：
 
-1. **问题描述**：四边形可以用两种方式分解为两个三角形
-2. **解决方案**：使用向量积判断正确的分解方式
-3. **算法逻辑**：
-   - 分解方式1：[AC]分解为三角形(C,A,D)和(C,A,B)
-   - 分解方式2：[BD]分解为三角形(B,D,A)和(B,D,C)
-   - 通过计算向量积的符号判断哪种分解正确
-   - 对于凹四边形，正确分解的向量积符号相反
+- ✅ Point类：包含Distance和Vectoriel函数
+- ✅ Triangle类：完整功能实现
+- ✅ Quadri类：包含凹四边形特殊处理
+- ✅ Cercle类：圆的完整实现
+- ✅ Forme继承体系：支持多态性
 
-## 完整解答
-
-详细的题目解答请参考 `solution.md` 文件，包含：
-
-### 练习1解答：
-- **1-a**：程序分析和输出预测
-- **1-b**：Distance函数的实现（欧几里得距离公式）
-- **1-c**：Triangle类的UML建模和完整实现
-- **1-d**：Quadri类的UML建模
-- **1-e**：Cercle类的UML建模
-- **1-f**：类的共同点分析
-- **1-g**：分层建模设计
-
-### 练习2解答：
-- **2-a**：项目验证和创建
-- **2-b**：Distance函数测试
-- **2-c**：Triangle类完整实现
-- **2-d**：继承体系设计和实现
-
-## 编译和部署教程
-
-### 环境要求
-
-- **操作系统**：macOS, Linux, Windows
-- **编译器**：支持C++11或更高版本的编译器（如g++, clang++）
-- **构建工具**：CMake 3.0或更高版本
-- **开发环境**：推荐使用Visual Studio Code或其他现代IDE
-
-### 编译步骤
-
-#### 1. 编译基础实现（Sources_Question_2a）
+## 编译运行
 
 ```bash
-# 进入项目目录
-cd "/Users/michael/Coding Project/td2cpp/TD2 2/Sources_Question_2a"
-
-# 创建构建目录（如果不存在）
-mkdir -p build
-cd build
-
-# 使用CMake配置项目
-cmake ..
-
-# 编译项目
+# 基础实现
+cd "TD2 2/Sources_Question_2a/build"
 make
+./TD_Geom         # 主程序
+./Test_All        # 测试所有功能
 
-# 或者使用并行编译加速
-make -j4
+# 继承实现  
+cd "TD2 2/Sources_Question_2d/build"
+make
+./Test_Complete   # 完整测试
+./Test_Forme      # 继承测试
 ```
 
-#### 2. 编译继承实现（Sources_Question_2d）
+## 项目结构
 
-```bash
-# 进入继承实现目录
-cd "/Users/michael/Coding Project/td2cpp/TD2 2/Sources_Question_2d"
-
-# 创建构建目录
-mkdir -p build
-cd build
-
-# CMake配置和编译
-cmake ..
-make -j4
+```
+TD2 2/
+├── Sources_Question_2a/    # 基础实现（无继承）
+└── Sources_Question_2d/    # 继承实现（Forme基类）
 ```
 
-### 运行测试程序
-
-#### Sources_Question_2a 测试程序：
-
-```bash
-# 在 Sources_Question_2a/build 目录下运行：
-
-# 主程序（练习1-a的验证程序）
-./TD_Geom
-
-# 距离函数测试
-./Test_Distance
-
-# 三角形类测试
-./Test_Triangle
-
-# 所有几何形状类测试
-./Test_All
-
-# 完整功能测试
-./Test_Complete
-```
-
-#### Sources_Question_2d 测试程序：
-
-```bash
-# 在 Sources_Question_2d/build 目录下运行：
-
-# 主程序
-./TD_Geom
-
-# 继承和多态性测试
-./Test_Forme
-
-# 完整功能测试（包含所有形状）
-./Test_Complete
-```
-
-### 常见问题解决
-
-#### 1. CMake找不到编译器
-
-```bash
-# 指定编译器
-export CXX=g++
-export CC=gcc
-cmake ..
-```
-
-#### 2. 数学库链接问题
-
-```bash
-# 如果遇到数学函数链接错误，确保CMakeLists.txt包含：
-# target_link_libraries(your_target m)
-```
-
-#### 3. C++标准版本问题
-
-```bash
-# 确保CMakeLists.txt包含：
-# set(CMAKE_CXX_STANDARD 11)
-```
-
-### 项目验证
-
-成功编译和运行后，您应该能看到以下输出：
-
-1. **TD_Geom**：显示练习1-a的程序分析结果
-2. **Test_Distance**：验证两点间距离计算
-3. **Test_Triangle**：验证三角形周长、面积、平移等功能
-4. **Test_Complete**：完整的功能验证，包括所有几何形状
-5. **Test_Forme**：继承和多态性的演示
-
-### 开发建议
-
-1. **代码风格**：遵循一致的命名约定和代码格式
-2. **测试驱动**：在实现新功能前先编写测试用例
-3. **文档**：保持代码注释的完整性和准确性
-4. **版本控制**：使用Git进行版本管理
-5. **调试**：使用调试器验证复杂算法（特别是四边形面积计算）
-
-### 扩展可能性
-
-- 添加更多几何形状（椭圆、多边形等）
-- 实现图形用户界面
-- 添加几何变换（旋转、缩放等）
-- 支持3D几何形状
-- 添加碰撞检测功能
-
-## 作者信息
-
-- **课程**：IF3 INSA GE - TD MOO C++/UML
-- **题目**：TD2 - 第一批类
-- **实现日期**：2025年6月
+每个目录都包含完整的源代码、测试程序和CMake构建文件。
 
 ---
 
-*本项目完整实现了TD2的所有要求，包括基础类设计、继承体系、特殊算法处理等。所有代码经过测试验证，确保功能正确性。*
+*这是一个完整的C++/UML面向对象编程练习，涵盖了类设计、继承、多态性等重要概念。所有代码经过测试验证，功能完整。*
 
 ## 项目验证结果
 
