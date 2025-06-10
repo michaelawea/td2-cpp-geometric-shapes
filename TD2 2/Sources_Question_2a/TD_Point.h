@@ -14,6 +14,7 @@ private:
 
  Point Add(const Point &pt) const;
  double Distance(const Point &pt) const;
+ double Vectoriel(const Point &pt1, const Point &pt2) const;
 
  void Afficher() const;
 

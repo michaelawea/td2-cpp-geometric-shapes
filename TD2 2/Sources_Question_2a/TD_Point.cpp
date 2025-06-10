@@ -23,6 +23,11 @@ double Point::Distance(const Point &pt) const
  return sqrt(dx * dx + dy * dy);
 }
 
+double Point::Vectoriel(const Point &pt1, const Point &pt2) const
+{
+ return (pt1.X - X)*(pt2.Y - Y) - (pt2.X - X)*(pt1.Y - Y);
+}
+
 void Point::Afficher() const
 {
  cout<< "(" << X << " ," << Y << " )";
